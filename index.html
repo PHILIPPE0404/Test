@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamX - API Live</title>
+    <style>
+        /* --- MÊME CSS QUE AVANT --- */
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #181818;
+            --text-white: #ffffff;
+            --text-gray: #b3b3b3;
+            --accent-red: #ff3b30;
+            --hover-dark: #252525;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-white); overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* Header */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 4%; background-color: rgba(15, 15, 15, 0.95);
+            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #333;
+        }
+        .logo { font-size: 1.8rem; font-weight: bold; color: var(--accent-red); letter-spacing: 1px; }
+        .search-bar { display: flex; align-items: center; background: #000; border: 1px solid #333; border-radius: 4px; padding: 0.5rem 1rem; width: 40%; }
+        .search-bar input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.9rem; }
+        .search-icon { color: var(--text-gray); margin-left: 10px; cursor: pointer; }
+        nav ul { display: flex; gap: 20px; }
+        nav a { font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+        nav a:hover { color: var(--accent-red); }
+
+        /* Hero */
+        .hero {
+            position: relative; width: 100%; height: 70vh; min-height: 400px;
+            display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;
+        }
+        .hero img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: blur(2px); }
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 800px; padding: 20px; }
+        .hero-title { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .hero-desc { font-size: 1.1rem; color: #ddd; margin-bottom: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .btn-play { background-color: var(--accent-red); color: white; padding: 12px 30px; border-radius: 4px; font-size: 1.1rem; font-weight: bold; border: none; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 10px; }
+        .btn-play:hover { background-color: #cc2e25; transform: scale(1.05); }
+
+        /* Categories */
+        .categories { padding: 1rem 4%; display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
+        .cat-btn { background-color: var(--card-bg); color: var(--text-gray); border: 1px solid #333; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: var(--transition); }
+        .cat-btn:hover, .cat-btn.active { background-color: var(--accent-red); color: white; border-color: var(--accent-red); }
+
+        /* Grid */
+        .grid-section { padding: 2rem 4%; }
+        .section-title { margin-bottom: 1.5rem; font-size: 1.5rem; border-left: 4px solid var(--accent-red); padding-left: 10px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
+        .video-card { background-color: var(--card-bg); border-radius: 8px; overflow: hidden; transition: var(--transition); cursor: pointer; position: relative; }
+        .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
+        
+        .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; background: #000; }
+        .thumbnail-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .thumbnail-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .video-card:hover .thumbnail-container img { transform: scale(1.1); }
+        
+        .duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .card-info { padding: 15px; }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-meta { display: flex; justify-content: space-between; color: var(--text-gray); font-size: 0.85rem; }
+        .views::before { content: "👁 "; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; }
+            .search-bar { width: 100%; }
+            nav ul { width: 100%; justify-content: center; }
+            .hero-title { font-size: 2rem; }
+            .hero { height: 50vh; }
+        }
+        @media (max-width: 480px) {
+            .video-grid { grid-template-columns: 1fr; }
+            nav ul { gap: 10px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">STREAMX</div>
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher...">
+            <span class="search-icon">🔍</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Accueil</a></li>
+                <li><a href="#">Films</a></li>
+                <li><a href="#">Séries</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero (Statique pour l'instant, pourrait être fetché aussi) -->
+    <section class="hero">
+        <img src="https://images.unsplash.com/photo-1626814026160-11bb62e8623d?q=80&w=2070&auto=format&fit=crop" alt="Hero Background">
+        <div class="hero-content">
+            <h1 class="hero-title">Cyber Horizon: L'Aube Nouvelle</h1>
+            <p class="hero-desc">Dans un futur où la technologie a fusionné avec l'humanité.</p>
+            <button class="btn-play">▶ Lecture</button>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <div class="categories">
+        <button class="cat-btn active">Tendances</button>
+        <button class="cat-btn">Action</button>
+        <button class="cat-btn">Sci-Fi</button>
+        <button class="cat-btn">Drame</button>
+    </div>
+
+    <!-- Video Grid (Vide, rempli par JS) -->
+    <section class="grid-section">
+        <h2 class="section-title">Vidéos en direct (API)</h2>
+        <div class="video-grid" id="videoGrid">
+            <!-- Les vidéos seront injectées ici par JS -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 20px;">Chargement des vidéos...</div>
+        </div>
+    </section>
+
+    <script>
+        // CONFIGURATION API
+        // Remplace 'TA_CLE_API_PEXELS' par ta vraie clé ici : https://www.pexels.com/api/
+        const PEXELS_API_KEY = 'TA_CLE_API_PEXELS'; 
+        const API_URL = 'https://api.pexels.com/videos/search?query=cinema&per_page=6&size=small';
+
+        async function loadVideos() {
+            const grid = document.getElementById('videoGrid');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    headers: {
+                        Authorization: PEXELS_API_KEY
+                    }
+                });
+
+                if (!response.ok) throw new Error("Erreur API");
+
+                const data = await response.json();
+                
+                // Vider le message de chargement
+                grid.innerHTML = '';
+
+                if (data.videos && data.videos.length > 0) {
+                    data.videos.forEach(video => {
+                        // Choisir une image de couverture (frame)
+                        const thumbnailUrl = video.image || video.video_files[0].link;
+                        const duration = formatDuration(video.duration);
+                        const title = video.title || "Vidéo sans titre";
+                        
+                        // Création de la carte
+                        const card = document.createElement('article');
+                        card.className = 'video-card';
+                        card.innerHTML = `
+                            <div class="thumbnail-container">
+                                <img src="${thumbnailUrl}" alt="${title}">
+                                <span class="duration">${duration}</span>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">${title}</h3>
+                                <div class="card-meta">
+                                    <span>${video.width}x${video.height}</span>
+                                    <span class="views">HD</span>
+                                </div>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<p>Aucune vidéo trouvée. Vérifie ta clé API.</p>';
+                }
+
+            } catch (error) {
+                console.error(error);
+                // Fallback si pas de clé API : on charge des données statiques pour la démo
+                loadFallbackData(grid);
+            }
+        }
+
+        // Fonction utilitaire pour formater la durée
+        function formatDuration(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Données de secours si l'API échoue (pour tester le design)
+        function loadFallbackData(grid) {
+            grid.innerHTML = '';
+            const fallbackVideos = [
+                { title: "Cyber City", img: "https://images.unsplash.com/photo-1536440136628-809727870924?q=80&w=1000&auto=format&fit=crop", dur: "1:45" },
+                { title: "Ocean Waves", img: "https://images.unsplash.com/photo-1478720568477-15283e73b142?q=80&w=1000&auto=format&fit=crop", dur: "2:10" },
+                { title: "Mountain Peak", img: "https://images.unsplash.com/photo-1518676590629-3d0cd853f528?q=80&w=1000&auto=format&fit=crop", dur: "0:45" },
+                { title: "Neon Lights", img: "https://images.unsplash.com/photo-1596727147705-54a9d0870312?q=80&w=1000&auto=format&fit=crop", dur: "1:30" },
+                { title: "Space Walk", img: "https://images.unsplash.com/photo-1517604931122-7727166369f0?q=80&w=1000&auto=format&fit=crop", dur: "2:05" },
+                { title: "Forest Mist", img: "https://images.unsplash.com/photo-1504639725590-34a02db45ed5?q=80&w=1000&auto=format&fit=crop", dur: "1:15" }
+            ];
+
+            fallbackVideos.forEach(v => {
+                const card = document.createElement('article');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <div class="thumbnail-container">
+                        <img src="${v.img}" alt="${v.title}">
+                        <span class="duration">${v.dur}</span>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">${v.title}</h3>
+                        <div class="card-meta">
+                            <span>HD</span>
+                            <span class="views">1M vues</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Lancer le chargement
+        document.addEventListener('DOMContentLoaded', loadVideos);
+    </script>
+</body>
+</html>
