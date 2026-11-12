@@ -3,290 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XStream - Streaming 18+</title>
+    <title>CloudBrowser - Navigateur Virtuel</title>
     <style>
-        /* --- CSS THEME SOMBRE --- */
-        :root {
-            --bg-color: #0f0f0f;
-            --card-bg: #181818;
-            --text-white: #ffffff;
-            --text-gray: #b3b3b3;
-            --accent-red: #ff3b30;
-            --header-height: 60px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        
-        body { 
-            background-color: var(--bg-color); 
-            color: var(--text-white); 
-            padding-top: calc(var(--header-height) + 20px);
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-
-        a { text-decoration: none; color: inherit; }
-
-        /* HEADER */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: rgba(15, 15, 15, 0.95);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 4%; z-index: 1000; border-bottom: 1px solid #333;
-            backdrop-filter: blur(5px);
+        /* Barre supérieure du navigateur virtuel */
+        .browser-bar {
+            background-color: #1e1e24;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #333;
         }
-
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-red); letter-spacing: 1px; }
-        .logo span { color: white; }
-
-        .search-container {
-            display: flex; gap: 10px;
+        .status-badge {
+            background-color: #00c853;
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
         }
-
-        .search-input {
-            background: #000; border: 1px solid #333; color: white;
-            padding: 8px 15px; border-radius: 4px; width: 300px; outline: none;
+        .nav-buttons button {
+            background: #2b2b36;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
         }
-        .search-input:focus { border-color: var(--accent-red); }
-
-        .btn-search {
-            background: var(--accent-red); border: none; color: white;
-            padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;
+        .nav-buttons button:hover {
+            background: #3e3e4e;
         }
-        .btn-search:hover { background: #cc2e25; }
-
-        /* PLAYER SECTION (Caché par défaut) */
-        #player-section {
-            display: none; /* Caché tant qu'on n'a pas cliqué */
-            width: 100%; max-width: 1000px; margin: 20px auto;
-            background: #000; padding: 10px; border-radius: 8px;
-            box-shadow: 0 0 20px rgba(255, 59, 48, 0.2);
+        .url-form {
+            flex-grow: 1;
+            display: flex;
+            gap: 8px;
         }
-
-        .video-wrapper {
-            position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden;
+        .url-input {
+            width: 100%;
+            background-color: #121214;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            outline: none;
         }
-        
-        .video-wrapper video {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        .url-input:focus {
+            border-color: #4f8cff;
         }
-
-        .back-btn {
-            margin-top: 10px; background: transparent; border: 1px solid #555;
-            color: white; padding: 5px 15px; cursor: pointer; border-radius: 4px;
+        .go-btn {
+            background-color: #4f8cff;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
         }
-        .back-btn:hover { border-color: white; }
-
-        /* GRID VIDEO */
-        .grid-container {
+        .go-btn:hover {
+            background-color: #3a75e6;
+        }
+        /* Barre de favoris rapides */
+        .bookmarks {
+            background-color: #18181d;
+            padding: 6px 15px;
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #2a2a32;
+        }
+        .bookmarks span {
+            color: #aaa;
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .bookmarks span:hover {
+            background-color: #2b2b36;
+            color: #fff;
+        }
+        /* Zone d'affichage principale */
+        .viewport {
+            flex-grow: 1;
+            position: relative;
+            background-color: #fff;
+            width: 100%;
+            height: 100%;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+        }
+        /* Page d'accueil intégrée avec Photos et Vidéos */
+        .home-screen {
+            width: 100%;
+            height: 100%;
+            background-color: #16161a;
+            color: #fff;
+            overflow-y: auto;
+            padding: 30px;
+        }
+        .hero {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+        .hero h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #4f8cff;
+        }
+        .hero p {
+            color: #bbb;
+            font-size: 15px;
+        }
+        .media-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px; padding: 20px 4%;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
         }
-
-        .video-card {
-            background: var(--card-bg); border-radius: 8px; overflow: hidden;
-            transition: transform 0.2s; cursor: pointer; position: relative;
+        .card {
+            background-color: #222228;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #333;
         }
-        .video-card:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-
-        .thumb-container {
-            position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
+        .card img, .card video {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
         }
-        
-        .thumb-container img {
-            width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s;
+        .card-body {
+            padding: 15px;
         }
-        
-        .duration-badge {
-            position: absolute; bottom: 5px; right: 5px;
-            background: rgba(0,0,0,0.8); color: white; font-size: 0.8rem;
-            padding: 2px 6px; border-radius: 4px; font-weight: bold;
+        .card-body h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
         }
-
-        .card-info { padding: 12px; }
-        .card-title { 
-            font-size: 0.95rem; font-weight: 600; line-height: 1.3;
-            margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; 
-            -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .card-meta { font-size: 0.8rem; color: var(--text-gray); display: flex; justify-content: space-between; }
-
-        /* LOADING & ERROR */
-        .status-msg { text-align: center; padding: 40px; font-size: 1.2rem; color: var(--text-gray); grid-column: 1/-1; }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .search-input { width: 150px; }
-            .grid-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-            .card-title { font-size: 0.85rem; }
+        .card-body p {
+            font-size: 13px;
+            color: #aaa;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <div class="logo">X<span>STREAM</span></div>
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Rechercher...">
-            <button class="btn-search" onclick="performSearch()">GO</button>
+    <!-- Barre de contrôle du navigateur -->
+    <div class="browser-bar">
+        <div class="status-badge">● SERVEUR ACTIF</div>
+        <div class="nav-buttons">
+            <button onclick="goHome()" title="Accueil">🏠 Accueil</button>
         </div>
-    </header>
+        <form class="url-form" onsubmit="loadUrl(event)">
+            <input type="text" id="urlInput" class="url-input" placeholder="Entrez une adresse web (ex: https://wikipedia.org)..." value="">
+            <button type="submit" class="go-btn">Aller</button>
+        </form>
+    </div>
 
-    <!-- Player Section -->
-    <section id="player-section">
-        <div class="video-wrapper">
-            <video id="mainPlayer" controls autoplay>
-                <source src="" type="video/mp4">
-                Votre navigateur ne supporte pas la vidéo.
-            </video>
+    <!-- Raccourcis de démonstration -->
+    <div class="bookmarks">
+        <span onclick="goHome()">🖼️ Galerie Photo & Vidéo</span>
+        <span onclick="openSite('https://wikipedia.org')">📚 Wikipédia</span>
+        <span onclick="openSite('https://openstreetmap.org')">🗺️ Carte Interactive</span>
+        <span onclick="openSite('https://archive.org')">🏛️ Internet Archive</span>
+    </div>
+
+    <!-- Écran principal -->
+    <div class="viewport">
+        <!-- Page d'accueil avec médias fonctionnels -->
+        <div id="homeScreen" class="home-screen">
+            <div class="hero">
+                <h1>Espace Multimédia & Navigation</h1>
+                <p>Utilisez la barre d'adresse en haut pour charger un site compatible ou testez directement la lecture vidéo et l'affichage photo ci-dessous.</p>
+            </div>
+
+            <div class="media-grid">
+                <!-- Carte Vidéo 1 -->
+                <div class="card">
+                    <video controls poster="https://unsplash.com">
+                        <source src="https://googleapis.com" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                    <div class="card-body">
+                        <h3>Flux Vidéo HD</h3>
+                        <p>Lecture vidéo directe avec contrôle du son, barre de progression et plein écran.</p>
+                    </div>
+                </div>
+
+                <!-- Carte Photo 1 -->
+                <div class="card">
+                    <img src="https://unsplash.com" alt="Réseau mondial">
+                    <div class="card-body">
+                        <h3>Connexion Serveur</h3>
+                        <p>Affichage d'images haute définition chargées depuis un serveur externe.</p>
+                    </div>
+                </div>
+
+                <!-- Carte Vidéo 2 -->
+                <div class="card">
+                    <video controls poster="https://unsplash.com">
+                        <source src="https://googleapis.com" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                    <div class="card-body">
+                        <h3>Streaming Animation</h3>
+                        <p>Test de fluidité vidéo en streaming continu dans l'interface.</p>
+                    </div>
+                </div>
+
+                <!-- Carte Photo 2 -->
+                <div class="card">
+                    <img src="https://unsplash.com" alt="Cybersécurité">
+                    <div class="card-body">
+                        <h3>Environnement Isolé</h3>
+                        <p>Interface de navigation avec barre d'URL et favoris rapides.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h2 id="playerTitle" style="margin: 10px 0; font-size: 1.2rem;"></h2>
-        <button class="back-btn" onclick="closePlayer()">✕ Fermer le lecteur</button>
-    </section>
 
-    <!-- Grid Container -->
-    <main class="grid-container" id="videoGrid">
-        <div class="status-msg">Chargement des vidéos...</div>
-    </main>
+        <!-- Cadre pour afficher les sites web -->
+        <iframe id="webFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
 
     <script>
-        // CONFIGURATION API
-        // On utilise l'API publique non-officielle mais stable de XVideos
-        const BASE_API = 'https://api.xvideos.com/api/v1';
-        const searchInput = document.getElementById('searchInput');
-        const videoGrid = document.getElementById('videoGrid');
-        const playerSection = document.getElementById('player-section');
-        const mainPlayer = document.getElementById('mainPlayer');
-        const playerTitle = document.getElementById('playerTitle');
+        const homeScreen = document.getElementById('homeScreen');
+        const webFrame = document.getElementById('webFrame');
+        const urlInput = document.getElementById('urlInput');
 
-        // Initialisation au chargement
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchTrending();
-            
-            // Recherche avec la touche Entrée
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') performSearch();
-            });
-        });
+        function goHome() {
+            webFrame.style.display = 'none';
+            webFrame.src = '';
+            homeScreen.style.display = 'block';
+            urlInput.value = '';
+        }
 
-        // Fonction pour chercher
-        async function performSearch() {
-            const query = searchInput.value.trim();
-            if (!query) return;
-            
-            showLoading("Recherche en cours...");
-            try {
-                // Note: L'API Xvideos accepte les requêtes directes depuis le navigateur
-                const response = await fetch(`${BASE_API}/search?keyword=${encodeURIComponent(query)}&count=24`);
-                const data = await response.json();
-                renderVideos(data.videos || []);
-            } catch (error) {
-                showError("Erreur de connexion à l'API.");
+        function openSite(url) {
+            urlInput.value = url;
+            homeScreen.style.display = 'none';
+            webFrame.style.display = 'block';
+            webFrame.src = url;
+        }
+
+        function loadUrl(event) {
+            event.preventDefault();
+            let url = urlInput.value.trim();
+            if (!url) return;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
             }
-        }
-
-        // Fonction pour charger les tendances (par défaut)
-        async function fetchTrending() {
-            showLoading("Chargement des tendances...");
-            try {
-                const response = await fetch(`${BASE_API}/trending?count=24`);
-                const data = await response.json();
-                renderVideos(data.videos || []);
-            } catch (error) {
-                showError("Impossible de charger les vidéos. Vérifie ta connexion.");
-            }
-        }
-
-        // Affichage des vidéos
-        function renderVideos(videos) {
-            videoGrid.innerHTML = '';
-            
-            if (videos.length === 0) {
-                videoGrid.innerHTML = '<div class="status-msg">Aucune vidéo trouvée.</div>';
-                return;
-            }
-
-            videos.forEach(video => {
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                
-                // Construction de l'URL de l'image (souvent besoin de rajouter /default.jpg ou similar)
-                // L'API retourne souvent une URL relative ou complète
-                let thumbUrl = video.thumb || video.thumburl;
-                if(thumbUrl && !thumbUrl.startsWith('http')) {
-                    thumbUrl = 'https://' + thumbUrl;
-                } else if (!thumbUrl) {
-                    thumbUrl = 'https://cdn-x.ivstream.me/images/xvideos-cdn/preview.webp';
-                }
-
-                card.innerHTML = `
-                    <div class="thumb-container" onclick="playVideo('${video.url}', '${escapeHtml(video.title)}')">
-                        <img src="${thumbUrl}" alt="${video.title}" loading="lazy">
-                        <span class="duration-badge">${video.duration}</span>
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title">${escapeHtml(video.title)}</div>
-                        <div class="card-meta">
-                            <span>${video.views} vues</span>
-                            <span>${video.quality || 'HD'}</span>
-                        </div>
-                    </div>
-                `;
-                videoGrid.appendChild(card);
-            });
-        }
-
-        // Lecture Vidéo
-        function playVideo(url, title) {
-            // L'url retournée par l'API est souvent une page HTML (ex: https://www.xvideos.com/video...)
-            // Nous devons extraire l'ID de la vidéo pour construire le lien MP4 direct
-            
-            const videoId = extractVideoId(url);
-            if(!videoId) {
-                alert("Lien vidéo non reconnu");
-                return;
-            }
-
-            // URL directe vers le fichier MP4 HD
-            const mp4Url = `https://cdn-x.ivstream.me/videos/${videoId}/hd.mp4`;
-            
-            // Mise à jour du player
-            mainPlayer.src = mp4Url;
-            playerTitle.textContent = title;
-            playerSection.style.display = 'block';
-            
-            // Scroll vers le player
-            playerSection.scrollIntoView({ behavior: 'smooth' });
-            
-            // Pause de la lecture si on veut juste voir la liste
-            // mainPlayer.play(); 
-        }
-
-        function closePlayer() {
-            mainPlayer.pause();
-            mainPlayer.src = "";
-            playerSection.style.display = 'none';
-        }
-
-        // Utilitaires
-        function showLoading(text) {
-            videoGrid.innerHTML = `<div class="status-msg">${text}</div>`;
-        }
-
-        function showError(text) {
-            videoGrid.innerHTML = `<div class="status-msg" style="color:red;">${text}</div>`;
-        }
-
-        function extractVideoId(url) {
-            // Extrait l'ID de l'URL (ex: video_123456 -> 123456)
-            const match = url.match(/video_(\d+)/);
-            return match ? match[1] : null;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return "";
-            return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            openSite(url);
         }
     </script>
+
 </body>
 </html>
