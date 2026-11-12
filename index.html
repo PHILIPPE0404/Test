@@ -3,85 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StreamX - API Live</title>
+    <title>XStream - Streaming 18+</title>
     <style>
-        /* --- MÊME CSS QUE AVANT --- */
+        /* --- CSS THEME SOMBRE --- */
         :root {
             --bg-color: #0f0f0f;
             --card-bg: #181818;
             --text-white: #ffffff;
             --text-gray: #b3b3b3;
             --accent-red: #ff3b30;
-            --hover-dark: #252525;
-            --transition: all 0.3s ease;
+            --header-height: 60px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-white); overflow-x: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-white); 
+            padding-top: calc(var(--header-height) + 20px);
+        }
+
         a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
 
-        /* Header */
+        /* HEADER */
         header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1rem 4%; background-color: rgba(15, 15, 15, 0.95);
-            position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #333;
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 15, 15, 0.95);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 4%; z-index: 1000; border-bottom: 1px solid #333;
+            backdrop-filter: blur(5px);
         }
-        .logo { font-size: 1.8rem; font-weight: bold; color: var(--accent-red); letter-spacing: 1px; }
-        .search-bar { display: flex; align-items: center; background: #000; border: 1px solid #333; border-radius: 4px; padding: 0.5rem 1rem; width: 40%; }
-        .search-bar input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 0.9rem; }
-        .search-icon { color: var(--text-gray); margin-left: 10px; cursor: pointer; }
-        nav ul { display: flex; gap: 20px; }
-        nav a { font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
-        nav a:hover { color: var(--accent-red); }
 
-        /* Hero */
-        .hero {
-            position: relative; width: 100%; height: 70vh; min-height: 400px;
-            display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000;
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-red); letter-spacing: 1px; }
+        .logo span { color: white; }
+
+        .search-container {
+            display: flex; gap: 10px;
         }
-        .hero img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: blur(2px); }
-        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 800px; padding: 20px; }
-        .hero-title { font-size: 3rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
-        .hero-desc { font-size: 1.1rem; color: #ddd; margin-bottom: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
-        .btn-play { background-color: var(--accent-red); color: white; padding: 12px 30px; border-radius: 4px; font-size: 1.1rem; font-weight: bold; border: none; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 10px; }
-        .btn-play:hover { background-color: #cc2e25; transform: scale(1.05); }
 
-        /* Categories */
-        .categories { padding: 1rem 4%; display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; }
-        .cat-btn { background-color: var(--card-bg); color: var(--text-gray); border: 1px solid #333; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; white-space: nowrap; transition: var(--transition); }
-        .cat-btn:hover, .cat-btn.active { background-color: var(--accent-red); color: white; border-color: var(--accent-red); }
+        .search-input {
+            background: #000; border: 1px solid #333; color: white;
+            padding: 8px 15px; border-radius: 4px; width: 300px; outline: none;
+        }
+        .search-input:focus { border-color: var(--accent-red); }
 
-        /* Grid */
-        .grid-section { padding: 2rem 4%; }
-        .section-title { margin-bottom: 1.5rem; font-size: 1.5rem; border-left: 4px solid var(--accent-red); padding-left: 10px; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        
-        .video-card { background-color: var(--card-bg); border-radius: 8px; overflow: hidden; transition: var(--transition); cursor: pointer; position: relative; }
-        .video-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
-        
-        .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; background: #000; }
-        .thumbnail-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .thumbnail-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .video-card:hover .thumbnail-container img { transform: scale(1.1); }
-        
-        .duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.8); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
-        .card-info { padding: 15px; }
-        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-meta { display: flex; justify-content: space-between; color: var(--text-gray); font-size: 0.85rem; }
-        .views::before { content: "👁 "; }
+        .btn-search {
+            background: var(--accent-red); border: none; color: white;
+            padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        .btn-search:hover { background: #cc2e25; }
 
-        /* Responsive */
+        /* PLAYER SECTION (Caché par défaut) */
+        #player-section {
+            display: none; /* Caché tant qu'on n'a pas cliqué */
+            width: 100%; max-width: 1000px; margin: 20px auto;
+            background: #000; padding: 10px; border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.2);
+        }
+
+        .video-wrapper {
+            position: relative; padding-bottom: 56.25%; /* 16:9 */ height: 0; overflow: hidden;
+        }
+        
+        .video-wrapper video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        .back-btn {
+            margin-top: 10px; background: transparent; border: 1px solid #555;
+            color: white; padding: 5px 15px; cursor: pointer; border-radius: 4px;
+        }
+        .back-btn:hover { border-color: white; }
+
+        /* GRID VIDEO */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px; padding: 20px 4%;
+        }
+
+        .video-card {
+            background: var(--card-bg); border-radius: 8px; overflow: hidden;
+            transition: transform 0.2s; cursor: pointer; position: relative;
+        }
+        .video-card:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        .thumb-container {
+            position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;
+        }
+        
+        .thumb-container img {
+            width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s;
+        }
+        
+        .duration-badge {
+            position: absolute; bottom: 5px; right: 5px;
+            background: rgba(0,0,0,0.8); color: white; font-size: 0.8rem;
+            padding: 2px 6px; border-radius: 4px; font-weight: bold;
+        }
+
+        .card-info { padding: 12px; }
+        .card-title { 
+            font-size: 0.95rem; font-weight: 600; line-height: 1.3;
+            margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .card-meta { font-size: 0.8rem; color: var(--text-gray); display: flex; justify-content: space-between; }
+
+        /* LOADING & ERROR */
+        .status-msg { text-align: center; padding: 40px; font-size: 1.2rem; color: var(--text-gray); grid-column: 1/-1; }
+        
+        /* RESPONSIVE */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 15px; }
-            .search-bar { width: 100%; }
-            nav ul { width: 100%; justify-content: center; }
-            .hero-title { font-size: 2rem; }
-            .hero { height: 50vh; }
-        }
-        @media (max-width: 480px) {
-            .video-grid { grid-template-columns: 1fr; }
-            nav ul { gap: 10px; font-size: 0.8rem; }
+            .search-input { width: 150px; }
+            .grid-container { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .card-title { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -89,147 +125,168 @@
 
     <!-- Header -->
     <header>
-        <div class="logo">STREAMX</div>
-        <div class="search-bar">
-            <input type="text" placeholder="Rechercher...">
-            <span class="search-icon">🔍</span>
+        <div class="logo">X<span>STREAM</span></div>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Rechercher...">
+            <button class="btn-search" onclick="performSearch()">GO</button>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#">Accueil</a></li>
-                <li><a href="#">Films</a></li>
-                <li><a href="#">Séries</a></li>
-            </ul>
-        </nav>
     </header>
 
-    <!-- Hero (Statique pour l'instant, pourrait être fetché aussi) -->
-    <section class="hero">
-        <img src="https://images.unsplash.com/photo-1626814026160-11bb62e8623d?q=80&w=2070&auto=format&fit=crop" alt="Hero Background">
-        <div class="hero-content">
-            <h1 class="hero-title">Cyber Horizon: L'Aube Nouvelle</h1>
-            <p class="hero-desc">Dans un futur où la technologie a fusionné avec l'humanité.</p>
-            <button class="btn-play">▶ Lecture</button>
+    <!-- Player Section -->
+    <section id="player-section">
+        <div class="video-wrapper">
+            <video id="mainPlayer" controls autoplay>
+                <source src="" type="video/mp4">
+                Votre navigateur ne supporte pas la vidéo.
+            </video>
         </div>
+        <h2 id="playerTitle" style="margin: 10px 0; font-size: 1.2rem;"></h2>
+        <button class="back-btn" onclick="closePlayer()">✕ Fermer le lecteur</button>
     </section>
 
-    <!-- Categories -->
-    <div class="categories">
-        <button class="cat-btn active">Tendances</button>
-        <button class="cat-btn">Action</button>
-        <button class="cat-btn">Sci-Fi</button>
-        <button class="cat-btn">Drame</button>
-    </div>
-
-    <!-- Video Grid (Vide, rempli par JS) -->
-    <section class="grid-section">
-        <h2 class="section-title">Vidéos en direct (API)</h2>
-        <div class="video-grid" id="videoGrid">
-            <!-- Les vidéos seront injectées ici par JS -->
-            <div style="grid-column: 1/-1; text-align: center; padding: 20px;">Chargement des vidéos...</div>
-        </div>
-    </section>
+    <!-- Grid Container -->
+    <main class="grid-container" id="videoGrid">
+        <div class="status-msg">Chargement des vidéos...</div>
+    </main>
 
     <script>
         // CONFIGURATION API
-        // Remplace 'TA_CLE_API_PEXELS' par ta vraie clé ici : https://www.pexels.com/api/
-        const PEXELS_API_KEY = 'TA_CLE_API_PEXELS'; 
-        const API_URL = 'https://api.pexels.com/videos/search?query=cinema&per_page=6&size=small';
+        // On utilise l'API publique non-officielle mais stable de XVideos
+        const BASE_API = 'https://api.xvideos.com/api/v1';
+        const searchInput = document.getElementById('searchInput');
+        const videoGrid = document.getElementById('videoGrid');
+        const playerSection = document.getElementById('player-section');
+        const mainPlayer = document.getElementById('mainPlayer');
+        const playerTitle = document.getElementById('playerTitle');
 
-        async function loadVideos() {
-            const grid = document.getElementById('videoGrid');
+        // Initialisation au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchTrending();
             
+            // Recherche avec la touche Entrée
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+        });
+
+        // Fonction pour chercher
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            showLoading("Recherche en cours...");
             try {
-                const response = await fetch(API_URL, {
-                    headers: {
-                        Authorization: PEXELS_API_KEY
-                    }
-                });
-
-                if (!response.ok) throw new Error("Erreur API");
-
+                // Note: L'API Xvideos accepte les requêtes directes depuis le navigateur
+                const response = await fetch(`${BASE_API}/search?keyword=${encodeURIComponent(query)}&count=24`);
                 const data = await response.json();
-                
-                // Vider le message de chargement
-                grid.innerHTML = '';
-
-                if (data.videos && data.videos.length > 0) {
-                    data.videos.forEach(video => {
-                        // Choisir une image de couverture (frame)
-                        const thumbnailUrl = video.image || video.video_files[0].link;
-                        const duration = formatDuration(video.duration);
-                        const title = video.title || "Vidéo sans titre";
-                        
-                        // Création de la carte
-                        const card = document.createElement('article');
-                        card.className = 'video-card';
-                        card.innerHTML = `
-                            <div class="thumbnail-container">
-                                <img src="${thumbnailUrl}" alt="${title}">
-                                <span class="duration">${duration}</span>
-                            </div>
-                            <div class="card-info">
-                                <h3 class="card-title">${title}</h3>
-                                <div class="card-meta">
-                                    <span>${video.width}x${video.height}</span>
-                                    <span class="views">HD</span>
-                                </div>
-                            </div>
-                        `;
-                        grid.appendChild(card);
-                    });
-                } else {
-                    grid.innerHTML = '<p>Aucune vidéo trouvée. Vérifie ta clé API.</p>';
-                }
-
+                renderVideos(data.videos || []);
             } catch (error) {
-                console.error(error);
-                // Fallback si pas de clé API : on charge des données statiques pour la démo
-                loadFallbackData(grid);
+                showError("Erreur de connexion à l'API.");
             }
         }
 
-        // Fonction utilitaire pour formater la durée
-        function formatDuration(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = Math.floor(seconds % 60);
-            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        // Fonction pour charger les tendances (par défaut)
+        async function fetchTrending() {
+            showLoading("Chargement des tendances...");
+            try {
+                const response = await fetch(`${BASE_API}/trending?count=24`);
+                const data = await response.json();
+                renderVideos(data.videos || []);
+            } catch (error) {
+                showError("Impossible de charger les vidéos. Vérifie ta connexion.");
+            }
         }
 
-        // Données de secours si l'API échoue (pour tester le design)
-        function loadFallbackData(grid) {
-            grid.innerHTML = '';
-            const fallbackVideos = [
-                { title: "Cyber City", img: "https://images.unsplash.com/photo-1536440136628-809727870924?q=80&w=1000&auto=format&fit=crop", dur: "1:45" },
-                { title: "Ocean Waves", img: "https://images.unsplash.com/photo-1478720568477-15283e73b142?q=80&w=1000&auto=format&fit=crop", dur: "2:10" },
-                { title: "Mountain Peak", img: "https://images.unsplash.com/photo-1518676590629-3d0cd853f528?q=80&w=1000&auto=format&fit=crop", dur: "0:45" },
-                { title: "Neon Lights", img: "https://images.unsplash.com/photo-1596727147705-54a9d0870312?q=80&w=1000&auto=format&fit=crop", dur: "1:30" },
-                { title: "Space Walk", img: "https://images.unsplash.com/photo-1517604931122-7727166369f0?q=80&w=1000&auto=format&fit=crop", dur: "2:05" },
-                { title: "Forest Mist", img: "https://images.unsplash.com/photo-1504639725590-34a02db45ed5?q=80&w=1000&auto=format&fit=crop", dur: "1:15" }
-            ];
+        // Affichage des vidéos
+        function renderVideos(videos) {
+            videoGrid.innerHTML = '';
+            
+            if (videos.length === 0) {
+                videoGrid.innerHTML = '<div class="status-msg">Aucune vidéo trouvée.</div>';
+                return;
+            }
 
-            fallbackVideos.forEach(v => {
-                const card = document.createElement('article');
+            videos.forEach(video => {
+                const card = document.createElement('div');
                 card.className = 'video-card';
+                
+                // Construction de l'URL de l'image (souvent besoin de rajouter /default.jpg ou similar)
+                // L'API retourne souvent une URL relative ou complète
+                let thumbUrl = video.thumb || video.thumburl;
+                if(thumbUrl && !thumbUrl.startsWith('http')) {
+                    thumbUrl = 'https://' + thumbUrl;
+                } else if (!thumbUrl) {
+                    thumbUrl = 'https://cdn-x.ivstream.me/images/xvideos-cdn/preview.webp';
+                }
+
                 card.innerHTML = `
-                    <div class="thumbnail-container">
-                        <img src="${v.img}" alt="${v.title}">
-                        <span class="duration">${v.dur}</span>
+                    <div class="thumb-container" onclick="playVideo('${video.url}', '${escapeHtml(video.title)}')">
+                        <img src="${thumbUrl}" alt="${video.title}" loading="lazy">
+                        <span class="duration-badge">${video.duration}</span>
                     </div>
                     <div class="card-info">
-                        <h3 class="card-title">${v.title}</h3>
+                        <div class="card-title">${escapeHtml(video.title)}</div>
                         <div class="card-meta">
-                            <span>HD</span>
-                            <span class="views">1M vues</span>
+                            <span>${video.views} vues</span>
+                            <span>${video.quality || 'HD'}</span>
                         </div>
                     </div>
                 `;
-                grid.appendChild(card);
+                videoGrid.appendChild(card);
             });
         }
 
-        // Lancer le chargement
-        document.addEventListener('DOMContentLoaded', loadVideos);
+        // Lecture Vidéo
+        function playVideo(url, title) {
+            // L'url retournée par l'API est souvent une page HTML (ex: https://www.xvideos.com/video...)
+            // Nous devons extraire l'ID de la vidéo pour construire le lien MP4 direct
+            
+            const videoId = extractVideoId(url);
+            if(!videoId) {
+                alert("Lien vidéo non reconnu");
+                return;
+            }
+
+            // URL directe vers le fichier MP4 HD
+            const mp4Url = `https://cdn-x.ivstream.me/videos/${videoId}/hd.mp4`;
+            
+            // Mise à jour du player
+            mainPlayer.src = mp4Url;
+            playerTitle.textContent = title;
+            playerSection.style.display = 'block';
+            
+            // Scroll vers le player
+            playerSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Pause de la lecture si on veut juste voir la liste
+            // mainPlayer.play(); 
+        }
+
+        function closePlayer() {
+            mainPlayer.pause();
+            mainPlayer.src = "";
+            playerSection.style.display = 'none';
+        }
+
+        // Utilitaires
+        function showLoading(text) {
+            videoGrid.innerHTML = `<div class="status-msg">${text}</div>`;
+        }
+
+        function showError(text) {
+            videoGrid.innerHTML = `<div class="status-msg" style="color:red;">${text}</div>`;
+        }
+
+        function extractVideoId(url) {
+            // Extrait l'ID de l'URL (ex: video_123456 -> 123456)
+            const match = url.match(/video_(\d+)/);
+            return match ? match[1] : null;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
     </script>
 </body>
 </html>
